@@ -9,7 +9,7 @@ from ai_translator.translator.translator import Translator
 
 
 # 假设的翻译函数
-def fake_translate(text, src_lang, dest_lang):
+def translate(text, src_lang, dest_lang):
     # 这里应该是调用翻译API的代码
     # 现在只是简单地返回原文加上" translated"来模拟翻译过程
     model = OpenAIModel(model="gpt-3.5-turbo", api_key=os.environ.get("OPENAI_API_KEY"))
@@ -28,7 +28,7 @@ def translate_text():
     dest_lang = dest_lang_combobox.get()
 
     # 翻译文本
-    translated = fake_translate(src_text, src_lang, dest_lang)
+    translated = translate(src_text, src_lang, dest_lang)
 
     # 显示翻译后的文本
     translated_text.delete("1.0", tk.END)
