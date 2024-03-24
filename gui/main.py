@@ -6,6 +6,7 @@ from tkinter import messagebox  # 导入messagebox模块，用于显示消息框
 
 from ai_translator.model import OpenAIModel
 from ai_translator.translator.translator import Translator
+from ai_translator.translator.pdf_translator import PDFTranslator
 
 
 # 假设的翻译函数
@@ -16,6 +17,16 @@ def translate(text, src_lang, dest_lang):
     translator = Translator(model=model)
     translated = translator.translate_text(text, src_lang, dest_lang)
     return translated
+
+
+def translate_pdf_file(pdf_file_path, file_format, target_language):
+    # 这里应该是调用翻译API的代码
+    # 现在只是简单地返回原文加上" translated"来模拟翻译过程
+    output_file_path = pdf_file_path.replace(".pdf", f"_translated")
+    model = OpenAIModel(model="gpt-3.5-turbo", api_key=os.environ.get("OPENAI_API_KEY"))
+    translator = PDFTranslator(model=model)
+    translator.translate_pdf(pdf_file_path, file_format, target_language, output_file_path)
+    return output_file_path
 
 
 # 翻译文本的函数
@@ -37,9 +48,21 @@ def translate_text():
 
 # 翻译PDF的函数
 def translate_pdf():
-    # 显示一个信息框，提示PDF翻译功能尚未实现
-    messagebox.showinfo("Info", "PDF translation is not implemented yet.")
+    # 弹出文件选择框，选择一个 pdf 文件
+    pdf_file_path = filedialog.askopenfilename()
+    if not pdf_file_path:
+        return
 
+    # 弹出文件选择框，选择一个目标语言
+    dest_lang = dest_lang_combobox.get()
+    if dest_lang == "Autodetection":
+        dest_lang = ""
+
+    # 翻译PDF
+    translated = translate_pdf_file(pdf_file_path, file_format="PDF", target_language=dest_lang)
+
+    # 弹框，翻译完成
+    messagebox.showinfo("Translate PDF", f"Translated PDF saved to {translated}")
 
 def main():
     # 使用global关键字声明全局变量，这样在其他函数中就可以访问到这些变量了
@@ -73,8 +96,6 @@ def main():
     dest_lang_combobox = ttk.Combobox(root, values=dest_languages, state="readonly")  # 创建一个下拉框，用于选择译文语言
     dest_lang_combobox.grid(row=2, column=4, padx=10, pady=20)  # 将下拉框添加到窗口，并设置位置和间距
     dest_lang_combobox.set("Chinese")  # 设置下拉框的默认选项
-
-
 
     # 启动GUI主循环
     root.mainloop()

@@ -1,6 +1,7 @@
 import os
 from reportlab.lib import colors, pagesizes, units
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
@@ -68,6 +69,10 @@ class Writer:
                         pdf_table = Table(table.values.tolist())
                         pdf_table.setStyle(table_style)
                         story.append(pdf_table)
+                    elif content.content_type == ContentType.IMAGE:
+                        # Add image to the PDF
+                        image = ImageReader(content.translation)
+                        story.append(image)
             # Add a page break after each page except the last one
             if page != book.pages[-1]:
                 story.append(PageBreak())

@@ -27,6 +27,7 @@ class PDFParser:
                 # Store the original text content
                 raw_text = pdf_page.extract_text()
                 tables = pdf_page.extract_tables()
+                images = pdf_page.images
 
                 # Remove each cell's content from the original text
                 for table_data in tables:
@@ -52,6 +53,11 @@ class PDFParser:
                     table = TableContent(tables)
                     page.add_content(table)
                     LOG.debug(f"[table]\n{table}")
+
+                if images:
+                    for image in images:
+                        image_content = Content(content_type=ContentType.IMAGE, original=image)
+                        page.add_content(image_content)
 
                 book.add_page(page)
 

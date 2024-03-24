@@ -14,6 +14,8 @@ class Model:
             return self.make_text_prompt(content.original, source_language, target_language)
         elif content.content_type == ContentType.TABLE:
             return self.make_table_prompt(content.get_original_as_str(), source_language, target_language)
+        else:
+            raise ValueError(f"Invalid content type. Expected {ContentType.TEXT}, but got {content.content_type}")
 
     def make_request(self, prompt):
         raise NotImplementedError("子类必须实现 make_request 方法")
