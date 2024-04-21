@@ -13,7 +13,7 @@ api_key_key = "GLM_API_KEY"
 
 # 假设的翻译函数
 def translate(text, src_lang, dest_lang):
-    model = load_model(model_combobox.get(), model_combobox.get())
+    model = load_model(ai_combobox.get(), model_combobox.get())
     translator = Translator(model=model)
     translated = translator.translate_text(text, src_lang, dest_lang)
     return translated
@@ -21,20 +21,20 @@ def translate(text, src_lang, dest_lang):
 
 def translate_pdf_file(pdf_file_path, file_format, target_language):
     output_file_path = pdf_file_path.replace(".pdf", f"_translated")
-    model = load_model(model_combobox.get(), model_combobox.get(), os.environ.get(api_key_key))
+    model = load_model(ai_combobox.get(), model_combobox.get())
     translator = PDFTranslator(model=model)
     translator.translate_pdf(pdf_file_path, file_format, target_language, output_file_path)
     return output_file_path
 
 def load_model(ai: str, model: str):
-    e_ai = AI.GLMAI
-    model_combobox.set("glm-4")
-    api_key_key = "GLMAI_API_KEY"
-
     if ai == "openai":
         e_ai = AI.OPENAI
         model_combobox.set("gpt-3.5-turbo")
         api_key_key = "OPENAI_API_KEY"
+    else:
+        e_ai = AI.GLMAI
+        model_combobox.set("glm-4")
+        api_key_key = "GLMAI_API_KEY"
 
     api_key = os.environ.get(api_key_key)
 
@@ -88,12 +88,12 @@ def main():
     # 创建下拉框，选择模型提供商，有 openai 和 glmai
     ai = ["openai", "glmai"]
     ai_combobox = ttk.Combobox(root, values=ai, state="readonly")  # 创建一个下拉框，用于选择模型提供商
-    ai_combobox.grid(row=0, column=1, padx=10, pady=10)  # 将下拉框添加到窗口，并设置位置和间距
+    ai_combobox.grid(row=0, column=0, padx=10, pady=10)  # 将下拉框添加到窗口，并设置位置和间距
     ai_combobox.set("glmai")  # 设置默认值
 
     models = ["gpt-3.5-turbo", "glm-4"]
     model_combobox = ttk.Combobox(root, values=models, state="readonly")  # 创建一个下拉框，用于选择模型
-    model_combobox.grid(row=0, column=3, padx=10, pady=10)  # 将下拉框添加到窗口，并设置位置和间距
+    model_combobox.grid(row=0, column=2, padx=10, pady=10)  # 将下拉框添加到窗口，并设置位置和间距
     model_combobox.set("glm-4")  # 设置默认值
 
     # 创建按钮
