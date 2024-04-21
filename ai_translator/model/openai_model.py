@@ -1,41 +1,51 @@
+from enum import Enum
+
 import requests
 import simplejson
 import time
 import os
 import openai
+from zhipuai import ZhipuAI
 
 from ai_translator.model import Model
 from ai_translator.utils import LOG
 from openai import OpenAI
 
+
+class AI(Enum):
+    OPENAI = "openai"
+    GLMAI = "glmai"
+
+
 class OpenAIModel(Model):
-    def __init__(self, model: str, api_key: str):
+    """
+    openai 兼容模型
+    """
+
+    def __init__(self, ai: AI, model: str, api_key: str):
         self.model = model
         if not api_key:
             api_key = os.getenv("OPENAI_API_KEY")
-        self.client = OpenAI(api_key=api_key)
 
-    def make_request(self, prompt):
+        self.ai = ai
+        if self.ai == AI.OPENAI:
+            self.client = OpenAI(api_key=api_key)
+        elif self.ai == AI.GLMAI:
+            self.client = ZhipuAI(api_key=api_key)
+        else:
+            raise Exception(f"{self.ai} is not a valid model")
+
+    def make_request(self, messages):
         attempts = 0
         while attempts < 3:
             try:
-                if self.model == "gpt-3.5-turbo":
-                    response = self.client.chat.completions.create(
+                response = self.client.chat.completions.create(
                         model=self.model,
-                        messages=[
-                            {"role": "user", "content": prompt}
-                        ]
-                    )
-                    translation = response.choices[0].message.content.strip()
-                else:
-                    response = self.client.completions.create(
-                        model=self.model,
-                        prompt=prompt,
+                        messages=messages,
                         max_tokens=150,
-                        temperature=0
+                        temperature=0.1
                     )
-                    translation = response.choices[0].text.strip()
-
+                translation = response.choices[0].message.content.strip()
                 return translation, True
             except openai.RateLimitError as e:
                 attempts += 1
@@ -46,7 +56,8 @@ class OpenAIModel(Model):
                     raise Exception("Rate limit reached. Maximum attempts exceeded.")
             except openai.APIConnectionError as e:
                 print("The server could not be reached")
-                print(e.__cause__)  # an underlying Exception, likely raised within httpx.            except requests.exceptions.Timeout as e:
+                print(
+                    e.__cause__)  # an underlying Exception, likely raised within httpx.            except requests.exceptions.Timeout as e:
             except openai.APIStatusError as e:
                 print("Another non-200-range status code was received")
                 print(e.status_code)

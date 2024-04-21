@@ -2,11 +2,14 @@ import requests
 import simplejson
 
 from ai_translator.model import Model
+from zhipuai import ZhipuAI
+
 
 class GLMModel(Model):
-    def __init__(self, model_url: str, timeout: int):
-        self.model_url = model_url
-        self.timeout = timeout
+    def __init__(self, model: str, api_key: str):
+        self.model = model
+        self.api_key = api_key
+        self.client = ZhipuAI(api_key=api_key)
 
     def make_request(self, prompt):
         try:

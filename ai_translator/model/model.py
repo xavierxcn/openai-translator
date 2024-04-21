@@ -1,13 +1,23 @@
 from ai_translator.book import ContentType
 
 
-class Model:
-    def make_text_prompt(self, text: str, source_language: str, target_language: str) -> str:
-        return f"translate {source_language} to {target_language}: {text}"
 
-    def make_table_prompt(self, table: str, source_language: str, target_language: str) -> str:
-        return (f"translate {source_language} to {target_language}，maintain spacing (spaces, separators), return in "
-                f"table form：\n{table}")
+def first_message():
+    return [
+    {"role": "system", "content": "You play the role of an all-powerful translation assistant, proficient in various languages around the world, helping me translate the following text according to specified requirements."},
+    ]
+
+class Model:
+    def make_text_messages(self, text: str, source_language: str, target_language: str) -> list:
+        messages = first_message()
+        messages.append({"role": "user", "content": f"translate {source_language} to {target_language}: {text}"})
+        return messages
+
+    def make_table_prompt(self, table: str, source_language: str, target_language: str) -> list:
+        messages = first_message()
+        messages.append({"role": "user", "content": (f"translate {source_language} to {target_language}，maintain spacing (spaces, separators), return in "
+                f"table form：\n{table}")})
+        return messages
 
     def translate_prompt(self, content, source_language: str, target_language: str) -> str:
         if content.content_type == ContentType.TEXT:
