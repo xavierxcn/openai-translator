@@ -4,7 +4,7 @@ from tkinter import ttk  # 导入ttk模块，用于创建更现代的GUI组件
 from tkinter import filedialog  # 导入filedialog模块，用于打开文件选择对话框（如果需要的话）
 from tkinter import messagebox  # 导入messagebox模块，用于显示消息框
 
-from ai_translator.model import OpenAIModel, AI
+from ai_translator.model import OpenAIModel, AI, ChatGLM2Model
 from ai_translator.translator.translator import Translator
 from ai_translator.translator.pdf_translator import PDFTranslator
 
@@ -27,6 +27,10 @@ def translate_pdf_file(pdf_file_path, file_format, target_language):
     return output_file_path
 
 def load_model(ai: str, model: str):
+    if model == "ChatGLM2-6B":
+        m = ChatGLM2Model()
+        return m
+
     if ai == "openai":
         e_ai = AI.OPENAI
         model_combobox.set("gpt-3.5-turbo")
@@ -38,8 +42,8 @@ def load_model(ai: str, model: str):
 
     api_key = os.environ.get(api_key_key)
 
-    model = OpenAIModel(ai=e_ai, model=model, api_key=api_key)
-    return model
+    m = OpenAIModel(ai=e_ai, model=model, api_key=api_key)
+    return m
 
 
 # 翻译文本的函数
@@ -91,7 +95,7 @@ def main():
     ai_combobox.grid(row=0, column=0, padx=10, pady=10)  # 将下拉框添加到窗口，并设置位置和间距
     ai_combobox.set("glmai")  # 设置默认值
 
-    models = ["gpt-3.5-turbo", "glm-4"]
+    models = ["gpt-3.5-turbo", "glm-4", "ChatGLM2-6B"]
     model_combobox = ttk.Combobox(root, values=models, state="readonly")  # 创建一个下拉框，用于选择模型
     model_combobox.grid(row=0, column=2, padx=10, pady=10)  # 将下拉框添加到窗口，并设置位置和间距
     model_combobox.set("glm-4")  # 设置默认值

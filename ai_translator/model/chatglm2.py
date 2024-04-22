@@ -1,9 +1,21 @@
+from ai_translator.model import Model
+
 
 from transformers import AutoTokenizer, AutoModel
-tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm2-6b", trust_remote_code=True)
-model = AutoModel.from_pretrained("THUDM/chatglm2-6b", trust_remote_code=True).to("mps")
-model = model.eval()
-response, history = model.chat(tokenizer, "你好", history=[])
-print(response)
-response, history = model.chat(tokenizer, "晚上睡不着应该怎么办", history=history)
-print(response)
+
+class ChatGLM2Model(Model):
+    def __init__(self):
+        self.tokenizer = AutoTokenizer.from_pretrained("THUDM/chatglm2-6b", trust_remote_code=True)
+        self.model = AutoModel.from_pretrained("THUDM/chatglm2-6b", trust_remote_code=True).to("cuda")
+        self.model = self.model.eval()
+
+    def make_request(self, messages):
+        history = []
+        content = ""
+        if len(messages) > 0:
+            message = messages[-1]
+            content = message["content"]
+        response, history = self.model.chat(self.tokenizer, content, history=history)
+        return response, True
+
+
